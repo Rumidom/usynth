@@ -36,6 +36,10 @@ saw_Lookup = [0, 655, 1311, 1966, 2621, 3277, 3932, 4587, 5243, 5898, 6553, 7209
 LookupLen = len(sine_Lookup)
 pi = 3.14159
 
+@micropython.native
+def getNoteFrequency(note) -> int:
+    return (BASE_NOTES_HERTZ[note])
+
 @micropython.viper
 def sqr_wave(n_samples:int,half_n_samples:int,x:int) -> int:
     if x < half_n_samples:
@@ -75,7 +79,7 @@ def generateByteWaveTable(sampleRate,func,freq,vol):
     w_len = 1/freq
     n_samples = int(w_len*sampleRate)
     half_n_samples = int(n_samples/2)
-    print(half_n_samples)
+    #print(half_n_samples)
     output = bytearray(n_samples*2)
     for i in range(n_samples):
         out  = func(n_samples,half_n_samples,i)*vol
