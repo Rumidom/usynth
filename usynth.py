@@ -82,8 +82,101 @@ def generateByteWaveTable(sampleRate,func,freq,vol):
     #print(half_n_samples)
     output = bytearray(n_samples*2)
     for i in range(n_samples):
-        out  = func(n_samples,half_n_samples,i)*vol
+        out  = int(func(n_samples,half_n_samples,i)*vol)
         out_bytes = out.to_bytes(2,'little')
         output[i*2] = out_bytes[0]
         output[(i*2)+1] = out_bytes[1]
     return output
+
+class secondOrderLowPass:
+    @micropython.native
+    def __init__(self,cutoff,Q_Res,sampleRate,clipping = 32767):
+        samplingInterval = 1/sampleRate
+        wc = cutoff*2*math.pi
+        tetac = wc*samplingInterval
+        self.y1 = 0 
+        self.y2 = 0
+        self.a1 = -2*Q_Res*math.cos(tetac)
+        self.a2 = Q_Res**2
+        self.b0 = 0.2
+        self.clipping = clipping
+        print(self.a1,self.a2)
+
+    @micropython.native
+    def ladderFunc(self,n_samples,half_n_samples,x,n=2):
+        for i in range(n):
+            
+    @micropython.native
+    def ladder(self,x,n=2):
+        for i in range(n):
+
+    @micropython.native
+    def solveFunc(self,n_samples,half_n_samples,x):
+        y = self.oscFunc(n_samples,half_n_samples,x)
+        return self.solve(y)
+    
+    @micropython.native
+    def solve(self,x):
+        y = x*self.b0 - self.y1*self.a1 - self.y2*self.a2 
+        self.y2 = self.y1
+        self.y1 = y
+        if y < -self.clipping:
+            return -self.clipping
+        elif y > self.clipping:
+            return self.clipping
+        return y
+
+
+class BiquadLowPass:
+    @micropython.native
+    def __init__(self,cutoff,Q_Res,sampleRate,oscilatorFunc,clipping = 32767):
+        samplingInterval = 1/sampleRate
+        wc = cutoff*2*math.pi
+        tetac = wc*samplingInterval
+        alpha = math.sin(tetac)/(2*Q_Res)
+        self.y0 = 0 
+        self.y1 = 0
+        self.y2 = 0
+        self.x1 = 0 
+        self.x2 = 0 
+        self.a0 = 1 + alpha
+        self.a1 = -2*math.cos(tetac)/self.a0
+        self.a2 = 1 - alpha/self.a0
+        self.b1 = 1 - math.cos(tetac)/self.a0
+        self.b0 = (self.b1/2)/self.a0
+        self.b2 = (self.b1/2)/self.a0
+        self.clipping = clipping
+        self.oscFunc = oscilatorFunc
+        print(self.a0,self.a1,self.a2,self.b0,self.b1,self.b2)
+        
+    @micropython.native
+    def setCoefficients(self,cutoff,Q_Res,sampleRate,clipping = 32767):
+        samplingInterval = 1/sampleRate
+        wc = cutoff*2*math.pi
+        tetac = wc*samplingInterval
+        alpha = math.sin(tetac)/(2*Q_Res)
+        self.a0 = 1 + alpha
+        self.a1 = -2*math.cos(tetac)/self.a0
+        self.a2 = 1 - alpha/self.a0
+        self.b1 = 1 - math.cos(tetac)/self.a0
+        self.b0 = (self.b1/2)/self.a0
+        self.b2 = (self.b1/2)/self.a0
+        self.clipping = clipping
+        
+    @micropython.native
+    def solveFunc(self,n_samples,half_n_samples,x):
+        y = self.oscFunc(n_samples,half_n_samples,x)
+        return self.solve(y)
+            
+    @micropython.native
+    def solve(self,x):
+        y = x*self.b0+self.x1*self.b1+self.x2*self.b2 - self.y1*self.a1 - self.y2*self.a2 
+        self.y2 = self.y1
+        self.y1 = y
+        self.x2 = self.x1
+        self.x1 = x
+        if y < -self.clipping:
+            return -self.clipping
+        elif y > self.clipping:
+            return self.clipping
+        return y

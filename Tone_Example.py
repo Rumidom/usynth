@@ -25,6 +25,7 @@ audio_out = I2S(
 )
 
 
+
 # this is the wave form sampled over one single wavelenght  
 samples = usynth.generateByteWaveTable(SAMPLE_RATE,WAVE_FORM,TONE_FREQUENCY,0.5)
 
@@ -33,4 +34,3 @@ while True:
     audio_out.write(samples)
 
 audio_out.deinit()
-print("Done")
