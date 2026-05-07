@@ -103,14 +103,6 @@ class secondOrderLowPass:
         print(self.a1,self.a2)
 
     @micropython.native
-    def ladderFunc(self,n_samples,half_n_samples,x,n=2):
-        for i in range(n):
-            
-    @micropython.native
-    def ladder(self,x,n=2):
-        for i in range(n):
-
-    @micropython.native
     def solveFunc(self,n_samples,half_n_samples,x):
         y = self.oscFunc(n_samples,half_n_samples,x)
         return self.solve(y)
