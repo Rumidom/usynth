@@ -9,10 +9,11 @@ from machine import Pin,PWM
 
 SAMPLE_RATE = 11025
 SAMPLE_DURATION = 1/SAMPLE_RATE
-with open("Laser_1_[35678]_11025_.dat", "rb") as data_file:
+with open("Jump_[264828]_11025_.dat", "rb") as data_file:
     samples = data_file.read()
 
-buzzer_pwm = PWM(Pin(22,Pin.OUT), freq=300_000)  # create a PWM object on a pin
+
+buzzer_pwm = PWM(Pin(22,Pin.OUT), freq=100_000)  # create a PWM object on a pin
 
 last_time = time.ticks_us()
 i = 0
@@ -20,9 +21,9 @@ while True:
     if i >= len(samples):
         break
     if (time.ticks_us() - last_time) > SAMPLE_DURATION:
-        buzzer_pwm.duty_u16(samples[i]*100)
+        buzzer_pwm.duty_u16(samples[i]*257)
         #print(samples[i])
         last_time = time.ticks_us()
-    i += 1
+        i += 1
 
         
