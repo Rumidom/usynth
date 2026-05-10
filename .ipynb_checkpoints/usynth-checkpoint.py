@@ -1,6 +1,5 @@
 import math
 import time
-import struct
 
 # Define note frequencies (middle octave - 4) Hz
 BASE_NOTES_HERTZ = {
@@ -58,7 +57,7 @@ def saw_wave(n_samples:int,half_n_samples:int,x:int) -> int:
     return int(y)
 
 @micropython.native
-def sine_wave(n_samples:int,µs_per_tickhalf_n_samples:int,x:int) -> int:
+def sine_wave(n_samples:int,half_n_samples:int,x:int) -> int:
     index = round((x/n_samples)*(LookupLen-1))
     y = sine_Lookup[index]
     return y
@@ -202,7 +201,7 @@ def readMidiFile(path):
         delta_times = False
         if chunkID == b'MThd':
             formt, ntracks, header_dict['tickdiv']  = struct.unpack('>HHH', chunk[0:6])
-            header_dict['us_per_tick'] = tempo/header_dict['tickdiv'] 
+            header_dict['µs_per_tick'] = tempo/header_dict['tickdiv'] 
             if formt != 1:
                     print('Only format 1 MIDI files are suported')
             #print('Header: ', header_dict)
@@ -232,7 +231,7 @@ def readMidiFile(path):
                         #print(current_ticks,"- Metadata > Track/Sequence name > ",meta_data)
                     elif meta_type == 0x51:
                         tempo = struct.unpack('>i', b'\x00'+meta_data)[0]
-                        header_dict['us_per_tick'] = tempo/header_dict['tickdiv']
+                        header_dict['µs_per_tick'] = tempo/header_dict['tickdiv']
                         header_dict['bpm'] = 60000000/tempo
                         #print(current_ticks,"- Metadata > Tempo > ",tempo)
                     elif meta_type == 0x58:
@@ -246,7 +245,7 @@ def readMidiFile(path):
                     offset += 1
                     vel = chunk[offset]
                     offset += 1
-                    event_time = int(current_ticks*header_dict['us_per_tick'])
+                    event_time = int(current_ticks*header_dict['µs_per_tick'])
                     if event_status//16 == 9:
                         note_ac = 'Note On'
                         current_note = {'n':note,'st':current_ticks}
