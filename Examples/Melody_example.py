@@ -22,7 +22,7 @@ def note_osc(freq,volume,duration,pwm_obj):
     halfperiod =  period/2
     noteToggle = False
     vol = int(65536*volume)
-    while (time.ticks_us() - initTime)<= duration:
+    while (time.ticks_us()-initTime)<= duration:
         if (time.ticks_us()-oscTime) >= halfperiod:
             oscTime = time.ticks_us()
             noteToggle = not noteToggle
@@ -47,6 +47,6 @@ for item in midi_dict['melody']:
     delt_ticks = item['delt']
     delt_us = int(midi_dict['header']['us_per_tick']*delt_ticks)
     while not core1_free:
-        pass
+        time.sleep_us(1)
     _thread.start_new_thread(note_osc,(freq,volume,delt_us,buzzer_pwm))
-
+    time.sleep_us(1)
