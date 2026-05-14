@@ -7,9 +7,9 @@ from machine import I2S
 from machine import Pin,PWM
 
 
-SAMPLE_RATE = 11025
+SAMPLE_RATE = 8000
 SAMPLE_DURATION = 1/SAMPLE_RATE
-with open("Jump_[264828]_11025_.dat", "rb") as data_file:
+with open("Jump_[264828]_8000_.dat", "rb") as data_file:
     samples = data_file.read()
 
 
